@@ -4,25 +4,49 @@ import VoteStats from '../VoteStats/VoteStats';
 import css from './App.module.css';
 import type { Votes, VoteType } from '../../types/votes';
 import { useState } from 'react';
+import Notification from '../Notification/Notification';
 
 export default function App() {
-  const votes: Votes = {
+  const initVotes: Votes = {
     good: 0,
     neutral: 0,
     bad: 0,
   };
-  const [vote, setVote] = useState<Votes>(votes);
+  const [votes, setVotes] = useState<Votes>(initVotes);
+
+  const totalVotes = votes.good + votes.neutral + votes.bad;
+  const canReset = totalVotes > 0;
+  const positiveRate =
+    totalVotes > 0 ? Math.round((votes.good / totalVotes) * 100) : 0;
+
+  const handleVote = (type: VoteType) => {
+    setVotes(prev => ({
+      ...prev,
+      [type]: prev[type] + 1,
+    }));
+  };
+
+  const resetVotes = () => {
+    setVotes(initVotes);
+  };
+
   return (
     <div className={css.app}>
-      <CafeInfo /> <VoteOptions /> <VoteStats />
+      <CafeInfo />
+      <VoteOptions
+        onVote={handleVote}
+        onReset={resetVotes}
+        canReset={canReset}
+      />
+      {!votes ? (
+        <VoteStats
+          votes={votes}
+          totalVotes={totalVotes}
+          positiveRate={positiveRate}
+        />
+      ) : (
+        <Notification />
+      )}
     </div>
   );
-
-  function handleVote(type: VoteType) {
-    return type;
-  }
-
-  function resetVotes() {
-    setVote(votes);
-  }
 }
