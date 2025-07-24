@@ -38,7 +38,7 @@ export default function App() {
         onReset={resetVotes}
         canReset={canReset}
       />
-      {!votes ? (
+      {totalVotes > 0 ? (
         <VoteStats
           votes={votes}
           totalVotes={totalVotes}
